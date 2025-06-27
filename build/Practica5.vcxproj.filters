@@ -67,6 +67,9 @@
     <ClCompile Include="C:\Users\menec\Documents\URJC\Rendering Avanzado II\P2\src\vulkan\compositionPassVK.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\vulkan\shadowsPassVK.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="C:\Users\menec\Documents\URJC\Rendering Avanzado II\P2\include\defines.h">
@@ -139,6 +142,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="C:\Users\menec\Documents\URJC\Rendering Avanzado II\P2\include\vulkan\compositionPassVK.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\vulkan\shadowsPassVK.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

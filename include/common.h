@@ -23,6 +23,7 @@
 #define INV_SQRT_TWO 0.70710678118654752440f
 
 #define SHADOW_MAP_SIZE 1024
+#define SHADOW_MAP_LAYERS 10
 
 namespace MiniEngine
 {
