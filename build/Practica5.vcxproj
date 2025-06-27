@@ -352,6 +352,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClInclude Include="C:\Users\menec\Documents\URJC\Rendering Avanzado II\P2\include\vulkan\deviceVK.h" />
     <ClInclude Include="C:\Users\menec\Documents\URJC\Rendering Avanzado II\P2\include\vulkan\windowVK.h" />
     <ClInclude Include="C:\Users\menec\Documents\URJC\Rendering Avanzado II\P2\include\vulkan\meshVK.h" />
+    <ClInclude Include="C:\Users\menec\Documents\URJC\Rendering Avanzado II\P2\include\vulkan\extensionsVK.h" />
     <ClInclude Include="C:\Users\menec\Documents\URJC\Rendering Avanzado II\P2\include\vulkan\renderPassVK.h" />
     <ClInclude Include="C:\Users\menec\Documents\URJC\Rendering Avanzado II\P2\include\vulkan\deferredPassVK.h" />
     <ClInclude Include="C:\Users\menec\Documents\URJC\Rendering Avanzado II\P2\include\vulkan\compositionPassVK.h" />
@@ -374,6 +375,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClCompile Include="C:\Users\menec\Documents\URJC\Rendering Avanzado II\P2\src\vulkan\windowVK.cpp" />
     <ClCompile Include="C:\Users\menec\Documents\URJC\Rendering Avanzado II\P2\src\vulkan\deviceVK.cpp" />
     <ClCompile Include="C:\Users\menec\Documents\URJC\Rendering Avanzado II\P2\src\vulkan\meshVK.cpp" />
+    <ClCompile Include="C:\Users\menec\Documents\URJC\Rendering Avanzado II\P2\src\vulkan\extensionsVK.cpp" />
     <ClCompile Include="C:\Users\menec\Documents\URJC\Rendering Avanzado II\P2\src\vulkan\deferredPassVK.cpp" />
     <ClCompile Include="C:\Users\menec\Documents\URJC\Rendering Avanzado II\P2\src\vulkan\compositionPassVK.cpp" />
   </ItemGroup>

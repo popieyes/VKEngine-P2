@@ -19,7 +19,7 @@
    <!-- Models --> 
 	<mesh type="obj">
 		<string name="filename" value=".\scenes\shadows\tower.obj"/>
-		<bsdf type="microfacet">
+		<bsdf type="diffuse">
 			<albedo name="albedo" value="0.2 0.12 0.08"></albedo>
 			<metallic name="metallic" value="0.0"></metallic>
 			<roughness name="roughness" value="0.8"></roughness>
@@ -27,7 +27,7 @@
 	</mesh>
 	<mesh type="obj">
 		<string name="filename" value=".\scenes\shadows\bridge.obj"/>
-		<bsdf type="microfacet">
+		<bsdf type="diffuse">
 			<albedo name="albedo" value="0.2 0.12 0.08"></albedo>
 			<metallic name="metallic" value="0.0"></metallic>
 			<roughness name="roughness" value="0.8"></roughness>
@@ -35,7 +35,7 @@
 	</mesh>
 	<mesh type="obj">
 		<string name="filename" value=".\scenes\shadows\floor.obj"/>
-		<bsdf type="microfacet">
+		<bsdf type="diffuse">
 			<albedo name="albedo" value="0.0 0.8 0.2"></albedo>
 			<metallic name="metallic" value="0.0"></metallic>
 			<roughness name="roughness" value="0.8"></roughness>
@@ -43,7 +43,7 @@
 	</mesh>
 	<mesh type="obj">
 		<string name="filename" value=".\scenes\shadows\tree.obj"/>
-		<bsdf type="microfacet">
+		<bsdf type="diffuse">
 			<albedo name="albedo" value="1.0 0.0 0.0"></albedo>
 			<metallic name="metallic" value="0.0"></metallic>
 			<roughness name="roughness" value="0.8"></roughness>
@@ -51,7 +51,7 @@
 	</mesh>
 	<mesh type="obj">
 		<string name="filename" value=".\scenes\shadows\river.obj"/>
-		<bsdf type="microfacet">
+		<bsdf type="diffuse">
 			<albedo name="albedo" value="0.0 0.02 1.0"></albedo>
 			<metallic name="metallic" value="0.5"></metallic>
 			<roughness name="roughness" value="0.2"></roughness>
