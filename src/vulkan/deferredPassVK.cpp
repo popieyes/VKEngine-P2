@@ -284,8 +284,8 @@ void DeferredPassVK::createRenderPass()
     attachments[ 4 ].storeOp        = VK_ATTACHMENT_STORE_OP_STORE;
     attachments[ 4 ].stencilLoadOp  = VK_ATTACHMENT_LOAD_OP_CLEAR;
     attachments[ 4 ].stencilStoreOp = VK_ATTACHMENT_STORE_OP_STORE;
-    attachments[ 4 ].initialLayout  = VK_IMAGE_LAYOUT_UNDEFINED;
-    attachments[ 4 ].finalLayout    = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
+    attachments[4].initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    attachments[4].finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
 
 
     VkAttachmentReference color_reference = {};

@@ -93,13 +93,13 @@ vec3 evalDiffuse()
         {
             case 0: //directional
             {
-                vec3 l = normalize( light.m_light_pos.xyz );
+                vec3 l = normalize( -light.m_light_pos.xyz );
                 shading += max( dot( n, l ), 0.0 ) * albedo.rgb * visibility;
                 break;
             }
             case 1: //point
             {
-                vec3 l = light.m_light_pos.xyz - frag_pos;
+                vec3 l = (per_frame_data.m_inv_view * light.m_light_pos).xyz - frag_pos;
                 float dist = length( l );
                 float att = 1.0 / (light.m_attenuattion.x + light.m_attenuattion.y * dist + light.m_attenuattion.z * dist * dist );
                 vec3 radiance = light.m_radiance.rgb * att;

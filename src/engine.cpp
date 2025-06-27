@@ -15,6 +15,7 @@
 // vulkan includes
 #include "vulkan/rendererVK.h"
 #include "vulkan/renderPassVK.h"
+#include "vulkan/depthPassVK.h"
 #include "vulkan/deferredPassVK.h"
 #include "vulkan/shadowsPassVK.h"
 #include "vulkan/compositionPassVK.h"
@@ -260,6 +261,12 @@ void Engine::createRenderPasses ()
     }
     m_render_passes.clear();
     
+	auto depth_pass = std::make_shared<DepthPassVK>(
+        m_runtime, 
+        m_render_target_attachments.m_depth_attachment);
+	depth_pass->initialize();
+
+	m_render_passes.push_back(depth_pass);
 
     auto gbuffer_pass = std::make_shared<DeferredPassVK>(
         m_runtime, 
@@ -274,7 +281,7 @@ void Engine::createRenderPasses ()
     
 	auto shadow_pass = std::make_shared<ShadowPassVK>
         (m_runtime, 
-        m_render_target_attachments.m_shadow_attachment);
+       m_render_target_attachments.m_shadow_attachment);
     shadow_pass->initialize();
     
 	m_render_passes.push_back(shadow_pass);
@@ -358,6 +365,7 @@ void Engine::updateGlobalBuffers()
             break;
         }
         perframe_data.m_lights[perframe_data.m_number_of_lights].m_light_pos = Vector4f(lightPos.x, lightPos.y, lightPos.z, light->m_data.m_type);
+        
         perframe_data.m_lights[perframe_data.m_number_of_lights].m_radiance = Vector4f(light->m_data.m_radiance.x, light->m_data.m_radiance.y, light->m_data.m_radiance.z, 0.0f);
         perframe_data.m_lights[perframe_data.m_number_of_lights].m_attenuattion = Vector4f(light->m_data.m_attenuation.x, light->m_data.m_attenuation.y, light->m_data.m_attenuation.z, 0.0f);
         perframe_data.m_lights[perframe_data.m_number_of_lights].m_view_projection = light->getLightSpaceMatrix(light, const_cast<Camera&>(m_scene->getCamera()));
