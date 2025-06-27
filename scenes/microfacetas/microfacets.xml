@@ -1,0 +1,84 @@
+<scene>
+    <!-- Independent sample generator, one sample per pixel
+	<sampler type="independent">
+		<integer name="sampleCount" value="1"/>
+	</sampler>
+
+    <!-- Render the visible surface normals 
+    <integrator type="normals"/>
+
+    <!-- Load the Stanford bunny (https://graphics.stanford.edu/data/3Dscanrep/) -->
+	<mesh type="obj">
+		<string name="filename" value=".\scenes\microfacetas\sphere.obj"/>
+		<bsdf type="microfacet">
+			<color name="albedo" value="0.5 0.0 0.0"/>
+			<float name="roughness" value="0.05"/>
+			<float name="metallic" value="0.0"/>
+		</bsdf>
+		<transform name="toWorld">
+			<translate value="3.0, 0.0, 0.0"/>
+		</transform>
+	</mesh>
+
+	<mesh type="obj">
+		<string name="filename" value=".\scenes\microfacetas\sphere.obj"/>
+		<bsdf type="microfacet">
+			<color name="albedo" value="0.5 0.0 0.0"/>
+			<float name="roughness" value="1.0"/>
+			<float name="metallic" value="0.0"/>
+		</bsdf>
+		<transform name="toWorld">
+			<translate value="1.0, 0.0, 0.0"/>
+		</transform>
+	</mesh>
+	
+	
+	<mesh type="obj">
+		<string name="filename" value=".\scenes\microfacetas\sphere.obj"/>
+		<bsdf type="microfacet">
+			<color name="albedo" value="0.5 0.0 0.0"/>
+			<float name="roughness" value="0.05"/>
+			<float name="metallic" value="1.0"/>
+		</bsdf>
+		<transform name="toWorld">
+			<translate value="-1.0, 0.0, 0.0"/>
+		</transform>
+	</mesh>
+
+
+	<mesh type="obj">
+		<string name="filename" value=".\scenes\microfacetas\sphere.obj"/>
+		<bsdf type="microfacet">
+			<color name="albedo" value="0.5 0.0 0.0"/>
+			<float name="roughness" value="1.0"/>
+			<float name="metallic" value="1.0"/>
+		</bsdf>
+		<transform name="toWorld">
+			<translate value="-3.0, 0.0, 0.0"/>
+		</transform>
+	</mesh>
+
+
+	<emitter type="directional">
+		<direction name="direction" value="0.0 -1.0 -1.0"/>
+		<radiance name="radiance" value="0.6 0.2 0.2"/>
+	</emitter>
+	
+	<!-- Render the scene viewed by a perspective camera -->
+	<camera type="perspective">
+        <!-- 3D origin, target point, and 'up' vector -->
+		<transform name="toWorld">
+            <lookat target="0.0, 0.0, 0.0"
+                    origin="0.0, 2.0, 10.0"
+                    up="0.0, 1.0, 0.0"/>
+		</transform>
+
+		<!-- Field of view: 30 degrees -->
+		<float name="fov" value="65"/>
+
+		<!-- 768 x 768 pixels -->
+		<integer name="width" value="800"/>
+		<integer name="height" value="800"/>
+		<clip name="far" value = "15.0"/>
+	</camera>
+</scene>

@@ -1,0 +1,150 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\menec\Documents\URJC\Rendering Avanzado II\P2\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\menec\Documents\URJC\Rendering Avanzado II\P2\src\entity.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\menec\Documents\URJC\Rendering Avanzado II\P2\src\engine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\menec\Documents\URJC\Rendering Avanzado II\P2\src\common.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\menec\Documents\URJC\Rendering Avanzado II\P2\src\camera.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\menec\Documents\URJC\Rendering Avanzado II\P2\src\light.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\menec\Documents\URJC\Rendering Avanzado II\P2\src\scene.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\menec\Documents\URJC\Rendering Avanzado II\P2\src\material.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\menec\Documents\URJC\Rendering Avanzado II\P2\src\diffuse.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\menec\Documents\URJC\Rendering Avanzado II\P2\src\microfacets.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\menec\Documents\URJC\Rendering Avanzado II\P2\src\transform.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\menec\Documents\URJC\Rendering Avanzado II\P2\src\meshRegistry.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\menec\Documents\URJC\Rendering Avanzado II\P2\src\shaderRegistry.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\menec\Documents\URJC\Rendering Avanzado II\P2\src\runtime.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\menec\Documents\URJC\Rendering Avanzado II\P2\src\vulkan\utilsVK.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\menec\Documents\URJC\Rendering Avanzado II\P2\src\vulkan\rendererVK.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\menec\Documents\URJC\Rendering Avanzado II\P2\src\vulkan\windowVK.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\menec\Documents\URJC\Rendering Avanzado II\P2\src\vulkan\deviceVK.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\menec\Documents\URJC\Rendering Avanzado II\P2\src\vulkan\meshVK.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\menec\Documents\URJC\Rendering Avanzado II\P2\src\vulkan\deferredPassVK.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\menec\Documents\URJC\Rendering Avanzado II\P2\src\vulkan\compositionPassVK.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\menec\Documents\URJC\Rendering Avanzado II\P2\include\defines.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\menec\Documents\URJC\Rendering Avanzado II\P2\include\common.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\menec\Documents\URJC\Rendering Avanzado II\P2\include\scene.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\menec\Documents\URJC\Rendering Avanzado II\P2\include\engine.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\menec\Documents\URJC\Rendering Avanzado II\P2\include\camera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\menec\Documents\URJC\Rendering Avanzado II\P2\include\light.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\menec\Documents\URJC\Rendering Avanzado II\P2\include\material.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\menec\Documents\URJC\Rendering Avanzado II\P2\include\entity.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\menec\Documents\URJC\Rendering Avanzado II\P2\include\meshRegistry.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\menec\Documents\URJC\Rendering Avanzado II\P2\include\diffuse.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\menec\Documents\URJC\Rendering Avanzado II\P2\include\microfacets.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\menec\Documents\URJC\Rendering Avanzado II\P2\include\transform.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\menec\Documents\URJC\Rendering Avanzado II\P2\include\runtime.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\menec\Documents\URJC\Rendering Avanzado II\P2\include\frame.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\menec\Documents\URJC\Rendering Avanzado II\P2\include\shaderRegistry.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\menec\Documents\URJC\Rendering Avanzado II\P2\include\vulkan\utilsVK.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\menec\Documents\URJC\Rendering Avanzado II\P2\include\vulkan\rendererVK.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\menec\Documents\URJC\Rendering Avanzado II\P2\include\vulkan\deviceVK.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\menec\Documents\URJC\Rendering Avanzado II\P2\include\vulkan\windowVK.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\menec\Documents\URJC\Rendering Avanzado II\P2\include\vulkan\meshVK.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\menec\Documents\URJC\Rendering Avanzado II\P2\include\vulkan\renderPassVK.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\menec\Documents\URJC\Rendering Avanzado II\P2\include\vulkan\deferredPassVK.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\menec\Documents\URJC\Rendering Avanzado II\P2\include\vulkan\compositionPassVK.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\menec\Documents\URJC\Rendering Avanzado II\P2\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{6718E533-3147-3B31-8B76-3CB7F9F7A420}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{99F89ED5-24BF-32E4-9EB2-3C429D9F0E83}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

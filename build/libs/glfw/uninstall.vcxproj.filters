@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\menec\Documents\URJC\Rendering Avanzado II\P2\build\CMakeFiles\d227391581a6ef3e400a2c01f6cfaa66\uninstall.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\menec\Documents\URJC\Rendering Avanzado II\P2\libs\glfw\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="C:\Users\menec\Documents\URJC\Rendering Avanzado II\P2\build\libs\glfw\CMakeFiles\uninstall" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{FA6A8DD2-3C61-325E-B91E-17B36BB7DB93}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
