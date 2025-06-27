@@ -54,6 +54,7 @@ bool DeferredPassVK::initialize()
     {
         VkShaderModule vert_module        = m_runtime.m_shader_registry->loadShader( "./shaders/vert.spv"       , VK_SHADER_STAGE_VERTEX_BIT   );
         VkShaderModule diffuse_module     = m_runtime.m_shader_registry->loadShader( "./shaders/diffuse.spv"    , VK_SHADER_STAGE_FRAGMENT_BIT );
+        VkShaderModule microfacets_module = m_runtime.m_shader_registry->loadShader("./shaders/microfacets.spv", VK_SHADER_STAGE_FRAGMENT_BIT);
         
         { // difuse
             VkPipelineShaderStageCreateInfo vert_shader{};
@@ -70,6 +71,23 @@ bool DeferredPassVK::initialize()
 
             m_pipelines[ static_cast<uint32_t>( Material::TMaterial::Diffuse ) ].m_shader_stages[ 0 ] = vert_shader;
             m_pipelines[ static_cast<uint32_t>( Material::TMaterial::Diffuse ) ].m_shader_stages[ 1 ] = frag_shader;
+        }
+
+        { // microfacetas
+            VkPipelineShaderStageCreateInfo vert_shader{};
+            vert_shader.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+            vert_shader.stage = VK_SHADER_STAGE_VERTEX_BIT;
+            vert_shader.module = vert_module;
+            vert_shader.pName = "main";
+
+            VkPipelineShaderStageCreateInfo frag_shader{};
+            frag_shader.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+            frag_shader.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
+            frag_shader.module = microfacets_module;
+            frag_shader.pName = "main";
+
+            m_pipelines[static_cast<uint32_t>(Material::TMaterial::Microfacets)].m_shader_stages[0] = vert_shader;
+            m_pipelines[static_cast<uint32_t>(Material::TMaterial::Microfacets)].m_shader_stages[1] = frag_shader;
         }
     }
 

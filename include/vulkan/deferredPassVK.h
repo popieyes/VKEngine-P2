@@ -52,7 +52,7 @@ namespace MiniEngine
             std::array<VkPipelineShaderStageCreateInfo, 2                    > m_shader_stages;
         };
 
-        std::array<MaterialPipeline, 1> m_pipelines; //one by material
+        std::array<MaterialPipeline, 2> m_pipelines; //one by material
        
         VkRenderPass                   m_render_pass;
         std::array<VkCommandBuffer, 3> m_command_buffer;
