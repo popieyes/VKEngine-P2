@@ -380,8 +380,6 @@ void Engine::createAttachments()
 {
     uint32_t width, height;
 
-	//Shadow Map Attachment Vars
-	const uint32_t SHADOW_MAP_SIZE = 1024;
 	const uint32_t DEPTH_LAYERS = 10;
     const uint32_t MIP_LEVELS = 1;
 

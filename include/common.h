@@ -22,6 +22,8 @@
 #define SQRT_TWO 1.41421356237309504880f
 #define INV_SQRT_TWO 0.70710678118654752440f
 
+#define SHADOW_MAP_SIZE 1024
+
 namespace MiniEngine
 {
 /// Simple exception class, which stores a human-readable error description
