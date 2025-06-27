@@ -47,6 +47,8 @@ class Light final
         float m_fov = 75.0f;
         float m_near = 0.01f;
         float m_far = 10.0f;
+
+        Matrix4f m_view_projection;
     };
 
     LightData m_data;

@@ -9,6 +9,7 @@ namespace MiniEngine
         alignas( 16 ) Vector4f m_light_pos;
         alignas( 16 ) Vector4f m_radiance;
         alignas( 16 ) Vector4f m_attenuattion;
+		alignas(16) Matrix4f m_view_projection;
     };
 
     struct PerFrameData

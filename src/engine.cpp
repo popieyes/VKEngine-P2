@@ -328,10 +328,26 @@ void Engine::updateGlobalBuffers()
         assert( perframe_data.m_number_of_lights < kMAX_NUMBER_LIGHTS );
        
         auto light = m_scene->getLights()[ perframe_data.m_number_of_lights ];
+ 
+        Vector3f lightPos;
 
-        perframe_data.m_lights[ perframe_data.m_number_of_lights ].m_light_pos    = Vector4f( light->m_data.m_position.x   , light->m_data.m_position.y   , light->m_data.m_position.z   , light->m_data.m_type );
-        perframe_data.m_lights[ perframe_data.m_number_of_lights ].m_radiance     = Vector4f( light->m_data.m_radiance.x   , light->m_data.m_radiance.y   , light->m_data.m_radiance.z   , 0.0f                 );
-        perframe_data.m_lights[ perframe_data.m_number_of_lights ].m_attenuattion = Vector4f( light->m_data.m_attenuation.x, light->m_data.m_attenuation.y, light->m_data.m_attenuation.z, 0.0f                 );
+        switch (light->m_data.m_type)
+        {
+        case Light::LightType::Directional:
+            lightPos = Vector3f(perframe_data.m_view_projection * Vector4f(light->m_data.m_position, 0));
+            break;
+        case Light::LightType::Point:
+            lightPos = Vector3f(perframe_data.m_view_projection * Vector4f(light->m_data.m_position, 1)); 
+            break;
+        default:
+            lightPos = light->m_data.m_position;
+            break;
+        }
+        perframe_data.m_lights[perframe_data.m_number_of_lights].m_light_pos = Vector4f(lightPos.x, lightPos.y, lightPos.z, light->m_data.m_type);
+        perframe_data.m_lights[perframe_data.m_number_of_lights].m_radiance = Vector4f(light->m_data.m_radiance.x, light->m_data.m_radiance.y, light->m_data.m_radiance.z, 0.0f);
+        perframe_data.m_lights[perframe_data.m_number_of_lights].m_attenuattion = Vector4f(light->m_data.m_attenuation.x, light->m_data.m_attenuation.y, light->m_data.m_attenuation.z, 0.0f);
+        perframe_data.m_lights[perframe_data.m_number_of_lights].m_view_projection = light->getLightSpaceMatrix(light, const_cast<Camera&>(m_scene->getCamera()));
+
     }
 
 
