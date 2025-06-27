@@ -38,7 +38,7 @@ void main() {
 
        mat4 lightViewProj = per_frame_data.m_lights[i].m_view_projection;
        
-       gl_Layer = i
+       gl_Layer = i; // Render to the layer corresponding to the light index
        
        for(int j = 0; j < 3; ++j) {
            vec4 pos = lightViewProj * vec4(g_position[j], 1.0);
