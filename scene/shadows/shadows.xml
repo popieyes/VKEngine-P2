@@ -1,0 +1,79 @@
+<scene>
+    <!-- Render the scene viewed by a perspective camera --> 
+	<camera type="perspective">
+        <!-- 3D origin, target point, and 'up' vector --> 
+		<transform name="toWorld">
+            <lookat target="0.0, 0.18 0.0"
+                    origin="0.0, 0.8, 1.8"
+                    up="0.0, 1.0, 0.0"/>
+		</transform>
+
+		 <!-- Field of view: 30 degrees --> 
+		<float name="fov" value="16"/>
+
+		 <!-- 768 x 768 pixels --> 
+		<integer name="width" value="1024"/>
+		<integer name="height" value="1024"/>
+	</camera>
+
+   <!-- Models --> 
+	<mesh type="obj">
+		<string name="filename" value=".\scenes\shadows\tower.obj"/>
+		<bsdf type="microfacet">
+			<albedo name="albedo" value="0.2 0.12 0.08"></albedo>
+			<metallic name="metallic" value="0.0"></metallic>
+			<roughness name="roughness" value="0.8"></roughness>
+		</bsdf>
+	</mesh>
+	<mesh type="obj">
+		<string name="filename" value=".\scenes\shadows\bridge.obj"/>
+		<bsdf type="microfacet">
+			<albedo name="albedo" value="0.2 0.12 0.08"></albedo>
+			<metallic name="metallic" value="0.0"></metallic>
+			<roughness name="roughness" value="0.8"></roughness>
+		</bsdf>
+	</mesh>
+	<mesh type="obj">
+		<string name="filename" value=".\scenes\shadows\floor.obj"/>
+		<bsdf type="microfacet">
+			<albedo name="albedo" value="0.0 0.8 0.2"></albedo>
+			<metallic name="metallic" value="0.0"></metallic>
+			<roughness name="roughness" value="0.8"></roughness>
+		</bsdf>
+	</mesh>
+	<mesh type="obj">
+		<string name="filename" value=".\scenes\shadows\tree.obj"/>
+		<bsdf type="microfacet">
+			<albedo name="albedo" value="1.0 0.0 0.0"></albedo>
+			<metallic name="metallic" value="0.0"></metallic>
+			<roughness name="roughness" value="0.8"></roughness>
+		</bsdf>
+	</mesh>
+	<mesh type="obj">
+		<string name="filename" value=".\scenes\shadows\river.obj"/>
+		<bsdf type="microfacet">
+			<albedo name="albedo" value="0.0 0.02 1.0"></albedo>
+			<metallic name="metallic" value="0.5"></metallic>
+			<roughness name="roughness" value="0.2"></roughness>
+		</bsdf>
+	</mesh>
+
+   <!-- Emitters --> 
+	<emitter type="ambient">
+		<radiance name="radiance" value="0.0001 0.0001 0.0001"/>
+	</emitter>
+
+	<emitter type="point">
+		<position name="position" value="-0.25 0.5 0.5"/>
+		<attenuation name="attenuation" value="1.0 0.09 0.032"/>
+		<radiance name="radiance" value="0.8 0.5 0.5"/>
+	</emitter>
+	<!-- <emitter type="point">
+		<position name="position" value="0.25 0.5 0.5"/>
+		<attenuation name="attenuation" value="1.0 0.09 0.032"/>
+		<radiance name="radiance" value="0.2 0.2 0.8"/>
+	</emitter> -->
+	
+
+	
+</scene>
