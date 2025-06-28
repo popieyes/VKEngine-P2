@@ -99,7 +99,7 @@ vec3 evalDiffuse()
             }
             case 1: //point
             {
-                vec3 l = (per_frame_data.m_inv_view * light.m_light_pos).xyz - frag_pos;
+                vec3 l = (light.m_light_pos).xyz - frag_pos;
                 float dist = length( l );
                 float att = 1.0 / (light.m_attenuattion.x + light.m_attenuattion.y * dist + light.m_attenuattion.z * dist * dist );
                 vec3 radiance = light.m_radiance.rgb * att;
@@ -151,85 +151,84 @@ vec3 fresnelVec(vec3 v, vec3 h, vec3 F0){
 	return fresnel;
 }
 
-vec3 evalMicrofacets(){
-	vec4  albedo       = texture( i_albedo  , f_uvs );
-    vec3  n            = normalize( texture( i_normal, f_uvs ).rgb * 2.0 - 1.0 ); 
-	vec3  frag_pos     = texture( i_position_and_depth, f_uvs ).xyz;
-	
-	//vec3  l 		   = per_frame_data.m_lights[0].m_light_pos.xyz - frag_pos;
-	
-	//vec3  h 		   = normalize(l + v);	
+vec3 evalMicrofacets()
+{
+    // Retrieve material properties from textures
+    vec4 albedo = texture(i_albedo, f_uvs);
+    vec3 n = normalize(texture(i_normal, f_uvs).rgb * 2.0 - 1.0);
+    vec3 frag_pos = texture(i_position_and_depth, f_uvs).xyz;
+    vec4 material_params = texture(i_material, f_uvs);
+
+    float metallic = material_params.r;
+    float roughness = material_params.g;
+    vec3 F0 = mix(vec3(0.04), albedo.rgb, metallic); // Interpolate between dielectric and metallic F0
     
-	
-    vec3  shading = vec3( 0.0 );
-	
-	vec3  v = normalize(per_frame_data.m_camera_pos.xyz - frag_pos);
-	float roughness = texture(i_material, f_uvs).y;
-	float metallic = texture(i_material, f_uvs).z;
-	
-	float F0 = mix(0.04, max(albedo.r, max(albedo.g, albedo.b)), metallic);
-	vec3 F0_vec = mix(vec3(0.04), albedo.rgb, metallic);
-	
-	vec3 l = vec3(0.0f);
-	
-	for( uint id_light = 0; id_light < per_frame_data.m_number_of_lights; id_light++ )
+    vec3 v = normalize(per_frame_data.m_camera_pos.xyz - frag_pos);
+    vec3 shading = vec3(0.0);
+
+    for(uint id_light = 0; id_light < per_frame_data.m_number_of_lights; id_light++)
     {
-        LightData light = per_frame_data.m_lights[ id_light ];
-        uint light_type = uint( floor( light.m_light_pos.a ) );
-		
-		vec3 diffuse = vec3(0.0f);
-		vec3 specular = vec3(0.0f);
-
-        switch( light_type )
+        LightData light = per_frame_data.m_lights[id_light];
+        uint light_type = uint(floor(light.m_light_pos.a));
+        
+        vec3 l;
+        vec3 radiance;
+        float visibility = evalVisibility(frag_pos, n, id_light);
+        // Calculate light direction and radiance based on light type
+        switch(light_type)
         {
-            case 0: //directional
-            {
-                l = normalize( -light.m_light_pos.xyz );
-                diffuse = max( dot( n, l ), 0.0 ) * light.m_radiance.rgb * albedo.rgb;
-				//diffuse = albedo.rgb * INV_PI;
-				
+            case 0: // directional
+                l = normalize(-light.m_light_pos.xyz);
+                radiance = light.m_radiance.rgb;
                 break;
-            }
-            case 1: //point
-            {
-                 l = light.m_light_pos.xyz - frag_pos;
-                float dist = length( l );
-                float att = 1.0 / (light.m_attenuattion.x + light.m_attenuattion.y * dist + light.m_attenuattion.z * dist * dist );
-                vec3 radiance = light.m_radiance.rgb * att;
-				l = normalize(l);
-
-                diffuse = max( dot( n, l ), 0.0 ) * albedo.rgb * radiance;
-		
+            case 1: // point
+                l = ( per_frame_data.m_inv_view * light.m_light_pos).xyz - frag_pos;
+                float dist = length(l);
+                l = normalize(l);
+                float att = 1.0 / (light.m_attenuattion.x + light.m_attenuattion.y * dist + light.m_attenuattion.z * dist * dist);
+                radiance = light.m_radiance.rgb * att;
                 break;
-            }
-            case 2: //ambient
-            {
+            case 2: // ambient
                 shading += light.m_radiance.rgb * albedo.rgb;
-                break;
-            }
+                continue; // Skip BRDF calculation for ambient
         }
-		
-		vec3  h = normalize(l + v);
-				
-		float ndf = normalDistribution(h, n, roughness);
-	
-		float g = geometricTerm(v, n, roughness) 
-			* geometricTerm(l, n, roughness);
-					
-		vec3 fresnel = fresnelVec(v, h, F0_vec);//fresnelScalar(v,h,F0) * vec3(1.0f);
-		
-		vec3 kD                 = vec3(1.0) - fresnel;
-		kD                      *= 1.0 - metallic;
-		
-		diffuse *= kD;
-	
-		specular = (ndf * fresnel * g) / (4.0 * max(dot(n, l), 0.0) * max(dot(n, v), 0.0));
-				
-		shading += (diffuse + specular) * light.m_radiance.rgb * max(dot(n, l), 0.0);
+        
+        // Calculate half vector
+        vec3 h = normalize(v + l);
+        
+        // Calculate dot products
+        float NdotV = max(dot(n, v), 0.0001);
+        float NdotL = max(dot(n, l), 0.0001);
+        float NdotH = max(dot(n, h), 0.0001);
+        float VdotH = max(dot(v, h), 0.0001);
+        
+        // 1. Normal Distribution Function (GGX/Trowbridge-Reitz)
+        float alpha = roughness * roughness;
+        float alpha2 = alpha * alpha;
+        float denom = (NdotH * NdotH) * (alpha2 - 1.0) + 1.0;
+        float D = alpha2 / (PI * denom * denom);
+        
+        // 2. Geometric term (Schlick)
+        float k = (roughness + 1.0) * (roughness + 1.0) / 8.0;
+        float G1_v = NdotV / (NdotV * (1.0 - k) + k);
+        float G1_l = NdotL / (NdotL * (1.0 - k) + k);
+        float G = G1_v * G1_l;
+        
+        // 3. Fresnel term (Modified Schlick)
+        float Fc = pow(1.0 - VdotH, 5.0);
+        vec3 F = F0 + (1.0 - F0) * pow(2.0, (-5.55473 * VdotH - 6.98316) * VdotH);
+        
+        // Combine terms for specular BRDF
+        vec3 specular = (D * F * G) / (4.0 * NdotV * NdotL);
+        
+        // Calculate diffuse (Lambert) - only for non-metals
+        vec3 diffuse = (1.0 - metallic) * albedo.rgb / PI;
+        
+        // Combine diffuse and specular
+        shading += (diffuse + specular) * radiance * NdotL * visibility;
     }
 
-	
-	return shading;
+    return shading;
 }
 
 void main() 
