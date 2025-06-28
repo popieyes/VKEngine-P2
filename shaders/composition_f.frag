@@ -42,10 +42,81 @@ layout(set = 0, binding = 6) uniform accelerationStructureEXT TLAS;
 layout(location = 0) out vec4 out_color;
 
 
+vec3 sampleDirectionInCone(vec3 coneDirection, float coneAngle, uint seed) {
+    // Método de muestreo uniforme en el cono
+    float u1 = fract(sin(dot(vec2(seed, seed + 1), vec2(12.9898, 78.233))) * 43758.5453);
+    float u2 = fract(sin(dot(vec2(seed + 2, seed + 3), vec2(39.3468, 11.1357))) * 24634.6345);
+
+    float cosTheta = mix(cos(coneAngle), 1.0, pow(u1, 4.0));
+    float sinTheta = sqrt(1.0 - cosTheta * cosTheta);
+    float phi = 2.0 * 3.141592 * u2;
+
+    vec3 direction;
+    direction.x = cos(phi) * sinTheta;
+    direction.y = sin(phi) * sinTheta;
+    direction.z = cosTheta;
+
+    // Crear base ortonormal para transformar la dirección
+    vec3 up = abs(coneDirection.z) < 0.999 ? vec3(0.0, 0.0, 1.0) : vec3(1.0, 0.0, 0.0);
+    vec3 tangent = normalize(cross(up, coneDirection));
+    vec3 bitangent = cross(coneDirection, tangent);
+
+    return normalize(tangent * direction.x + bitangent * direction.y + coneDirection * direction.z);
+}
+
 //Ray Tracing defines
 #define NUM_SOFT_SHADOW_RAYS 16
 #define LIGHT_RADIUS 0.5   
 
+// Ray Tracing Visibility Evaluation with Soft Shadows
+float evalVisibility(vec3 frag_pos, vec3 normal, vec3 light_dir, float coneAngle, int numSamples) {
+    // Origen del rayo
+    vec3 origin = frag_pos + normal * 0.01;
+
+    // Distancia mínima y máxima de recorrido del rayo
+    float t_min = 0.001;
+    float t_max = 100.0;
+
+    int visibleCount = 0;
+    uint randSeed = uint(gl_FragCoord.x * 17.0 + gl_FragCoord.y * 131.0);
+
+    for (int i = 0; i < numSamples; ++i) {
+        // Dirección del rayo
+        vec3 sample_dir = sampleDirectionInCone(light_dir, coneAngle, randSeed + uint(i));
+
+        // Inicialización del ray query
+        rayQueryEXT ray_query;
+
+        rayQueryInitializeEXT(
+            ray_query,
+            TLAS,
+            gl_RayFlagsTerminateOnFirstHitEXT | gl_RayFlagsOpaqueEXT,
+            0xFF,
+            origin,
+            t_min,
+            sample_dir,
+            t_max
+        );
+
+        // Busqueda de colisiones
+        while(rayQueryProceedEXT(ray_query)) {
+            if(rayQueryGetIntersectionTypeEXT(ray_query, false) == gl_RayQueryCandidateIntersectionTriangleEXT) {
+                rayQueryConfirmIntersectionEXT(ray_query);
+            }
+        }
+
+        if (rayQueryGetIntersectionTypeEXT(ray_query, true) == gl_RayQueryCommittedIntersectionNoneEXT) {
+            visibleCount += 1;
+        }
+    }
+
+    // Se calcula la visibilidad como el porcentaje de rayos no bloqueados
+    float rawVisibility = float(visibleCount) / float(numSamples);
+
+    return clamp((rawVisibility - 0.2) / 0.8, 0.0, 1.0); // Se ajusta el valor para suavizar el umbral de sombra (entre 0 y 1)
+}
+
+// Ray Tracing Visibility Evaluation
 float evalVisibility(vec3 frag_pos, vec3 normal, vec3 light_dir) {
     // Origen del rayo
     vec3 origin = frag_pos + normal * 0.01;
@@ -79,13 +150,14 @@ float evalVisibility(vec3 frag_pos, vec3 normal, vec3 light_dir) {
         }
     }
 
-    if (rayQueryGetIntersectionTypeEXT(ray_query, true) != gl_RayQueryCommittedIntersectionNoneEXT) {
+     if (rayQueryGetIntersectionTypeEXT(ray_query, true) != gl_RayQueryCommittedIntersectionNoneEXT) {
         hit = true;
-    }
+    } 
 
     return hit ? 0.0 : 1.0;
 }
 
+// Shadow Mapping Visibility Evaluation
 float evalVisibility(vec3 frag_pos, uint id_light){
     LightData light = per_frame_data.m_lights[id_light];
     vec4 light_space_pos = light.m_view_projection * vec4(frag_pos, 1.0);
@@ -200,7 +272,11 @@ vec3 evalMicrofacets()
                 float dist = length(l);
                 l = normalize(l);
                 float att = 1.0 / (light.m_attenuattion.x + light.m_attenuattion.y * dist + light.m_attenuattion.z * dist * dist);
-                visibility = evalVisibility(frag_pos  ,n,l);
+                //visibility = evalVisibility(frag_pos  ,n,l);
+                float lightRadius = 0.025;
+                float coneAngle = atan(lightRadius / dist);
+                int numSamples = 64;
+                visibility = evalVisibility(frag_pos, n, l,coneAngle, numSamples);
                 radiance = light.m_radiance.rgb * att;
                 break;
             case 2: // ambient
