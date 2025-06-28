@@ -189,8 +189,9 @@ void DeviceVK::createDevice()
     device_create_info.sType                = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
     device_create_info.queueCreateInfoCount = static_cast< uint32_t >( queue_create_infos.size() );
     device_create_info.pQueueCreateInfos    = queue_create_infos.data();
-    device_create_info.pEnabledFeatures     = &m_physical_device_features;
-    device_create_info.pNext                = nullptr;
+    //device_create_info.pEnabledFeatures     = &m_physical_device_features;
+    device_create_info.pEnabledFeatures = nullptr; // Ya no usamos esto directamente
+    device_create_info.pNext                = &m_physical_device_features2;
 
     // Enable the debug marker extension if it is present (likely meaning a debugging tool is present)
 #ifdef DEBUG
@@ -206,6 +207,114 @@ void DeviceVK::createDevice()
         m_extensions.push_back( VK_EXT_DEBUG_MARKER_EXTENSION_NAME );
     }
 #endif 
+
+    // Add Raytracing Extensions
+   // -----------------------------------------------------
+
+    m_physical_device_features2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
+    m_physical_device_features2.pNext = nullptr;
+
+    // Start chaining from the last element so we preserve order
+    void** pNextHead = &m_physical_device_features2.pNext;
+
+    VkPhysicalDeviceRayQueryFeaturesKHR rayQueryFeatures = {};
+
+    
+    if (std::find(m_supported_extensions.begin(), m_supported_extensions.end(), VK_KHR_RAY_QUERY_EXTENSION_NAME) !=
+        m_supported_extensions.end())
+    {
+        m_extensions.push_back(VK_KHR_RAY_QUERY_EXTENSION_NAME);
+
+        rayQueryFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_QUERY_FEATURES_KHR;
+        rayQueryFeatures.pNext = nullptr;
+        rayQueryFeatures.rayQuery = VK_TRUE;
+
+        *pNextHead = &rayQueryFeatures;
+        pNextHead = &rayQueryFeatures.pNext;
+    }
+   
+    // 1. Buffer Device Address (requerido por Acceleration Structure)
+    VkPhysicalDeviceBufferDeviceAddressFeatures bufferDeviceAddressFeatures = {};
+
+    if (std::find(m_supported_extensions.begin(), m_supported_extensions.end(),
+        VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME) != m_supported_extensions.end())
+    {
+        m_extensions.push_back(VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME);
+        bufferDeviceAddressFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BUFFER_DEVICE_ADDRESS_FEATURES;
+        bufferDeviceAddressFeatures.bufferDeviceAddress = VK_TRUE;
+        *pNextHead = &bufferDeviceAddressFeatures;
+        pNextHead = &bufferDeviceAddressFeatures.pNext;
+    }
+
+    // 2. Descriptor Indexing (útil para ray tracing)
+    VkPhysicalDeviceDescriptorIndexingFeatures descriptorIndexingFeatures = {};
+    if (std::find(m_supported_extensions.begin(), m_supported_extensions.end(),
+        VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME) != m_supported_extensions.end()) {
+        m_extensions.push_back(VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME);
+        descriptorIndexingFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES;
+        descriptorIndexingFeatures.shaderSampledImageArrayNonUniformIndexing = VK_TRUE;
+        descriptorIndexingFeatures.runtimeDescriptorArray = VK_TRUE;
+        *pNextHead = &descriptorIndexingFeatures;
+        pNextHead = &descriptorIndexingFeatures.pNext;
+    }
+
+    // 3. Acceleration Structure
+    VkPhysicalDeviceAccelerationStructureFeaturesKHR accelerationStructureFeatures = {};
+    if (std::find(m_supported_extensions.begin(), m_supported_extensions.end(),
+        VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME) != m_supported_extensions.end()) {
+        m_extensions.push_back(VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME);
+        accelerationStructureFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_FEATURES_KHR;
+        accelerationStructureFeatures.accelerationStructure = VK_TRUE;
+        *pNextHead = &accelerationStructureFeatures;
+        pNextHead = &accelerationStructureFeatures.pNext;
+    }
+
+    // 4. Ray Tracing Pipeline
+    VkPhysicalDeviceRayTracingPipelineFeaturesKHR rayTracingPipelineFeatures = {};
+    if (std::find(m_supported_extensions.begin(), m_supported_extensions.end(),
+        VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME) != m_supported_extensions.end()) {
+        m_extensions.push_back(VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME);
+        rayTracingPipelineFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_FEATURES_KHR;
+        rayTracingPipelineFeatures.rayTracingPipeline = VK_TRUE;
+        *pNextHead = &rayTracingPipelineFeatures;
+        pNextHead = &rayTracingPipelineFeatures.pNext;
+    }
+
+    // 5. Ray Query
+    VkPhysicalDeviceRayQueryFeaturesKHR rayQueryFeatures = {};
+    if (std::find(m_supported_extensions.begin(), m_supported_extensions.end(),
+        VK_KHR_RAY_QUERY_EXTENSION_NAME) != m_supported_extensions.end()) {
+        m_extensions.push_back(VK_KHR_RAY_QUERY_EXTENSION_NAME);
+        rayQueryFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_QUERY_FEATURES_KHR;
+        rayQueryFeatures.rayQuery = VK_TRUE;
+        *pNextHead = &rayQueryFeatures;
+        pNextHead = &rayQueryFeatures.pNext;
+    }
+
+    // 6. Deferred Host Operations (siempre que esté disponible)
+      if (std::find(m_supported_extensions.begin(), m_supported_extensions.end(),
+        VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME) != m_supported_extensions.end())
+    {
+        m_extensions.push_back(VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME);
+    }
+
+    // Verifica que todas las extensiones requeridas están disponibles
+    std::vector<const char*> requiredExtensions = {
+        VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME,
+        VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME,
+        VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME,
+        VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME
+    };
+
+    for (const auto& ext : requiredExtensions) {
+        if (std::find(m_supported_extensions.begin(), m_supported_extensions.end(), ext) == m_supported_extensions.end()) {
+            throw std::runtime_error(std::string("Required extension not supported: ") + ext);
+        }
+    }
+    
+
+    // -----------------------------------------------------
+    
 
     if( m_extensions.size() > 0 )
     {
