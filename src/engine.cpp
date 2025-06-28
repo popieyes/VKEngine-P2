@@ -24,7 +24,7 @@
 #include "vulkan/deviceVK.h"
 #include "vulkan/utilsVK.h"
 #include "vulkan/meshVK.h"
-#include "vulkan/vulkan.h"
+
 
 
 
@@ -146,8 +146,9 @@ void Engine::run()
             createSyncObjects ();
             createSamplers    ();
             createAttachments ();
-            createRenderPasses();
             updateTLAS();
+            createRenderPasses();
+           
         }                   
 
 
@@ -221,6 +222,7 @@ void Engine::loadScene( const std::string& i_path )
 
     createSamplers    ();
     createAttachments ();
+    updateTLAS();
     createRenderPasses();
 
     RendererVK& renderer = *m_runtime.m_renderer;
@@ -314,6 +316,7 @@ void Engine::createRenderPasses ()
         m_render_target_attachments.m_normal_attachment, 
         m_render_target_attachments.m_material_attachment,  
 		m_render_target_attachments.m_shadow_attachment,
+		m_tlas_structure,
         m_runtime.m_renderer->getWindow().getSwapChainImages() );
     composition_pass->initialize();
 
@@ -562,7 +565,7 @@ void Engine::updateTLAS() {
         // Obtener entidades con verificación
         auto entities = m_scene->getMeshes();
         if (entities.empty()) {
-            return; // Escena vacía, no hay nada que actualizar
+            throw std::runtime_error("Scene is empty");
         }
 
         std::vector<Matrix4f> transforms;
@@ -572,7 +575,7 @@ void Engine::updateTLAS() {
 
         for (auto entity : entities) {
             if (!entity) {
-                continue; // O loggear un warning
+                throw std::runtime_error("Entity is null");
             }
 
             try {

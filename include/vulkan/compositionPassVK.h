@@ -18,6 +18,7 @@ namespace MiniEngine
                             const ImageBlock& i_in_normal_attachment,
                             const ImageBlock& i_in_material_attachment,
 			                const ImageBlock& i_in_shadow_attachment,
+                            const VkAccelerationStructureKHR& i_tlas,
                             const std::array<ImageBlock, 3>& i_output_swap_images 
                           );
         virtual ~CompositionPassVK();
@@ -60,6 +61,7 @@ namespace MiniEngine
         ImageBlock m_in_normal_attachment;
         ImageBlock m_in_material_attachment;
 		ImageBlock m_in_shadow_attachment;
+        VkAccelerationStructureKHR m_tlas;
         std::array<ImageBlock, 3> m_output_swap_images;
     };
 };

@@ -1,10 +1,13 @@
 #version 460
 
+#extension GL_EXT_ray_query : enable
 #extension GL_ARB_shader_draw_parameters : enable
 #define INV_PI 0.31830988618
 #define PI   3.14159265358979323846264338327950288
+#define RTX
 
 layout( location = 0 ) in vec2 f_uvs;
+
 
 //globals
 struct LightData
@@ -34,10 +37,54 @@ layout ( set = 0, binding = 2 ) uniform sampler2D i_position_and_depth;
 layout ( set = 0, binding = 3 ) uniform sampler2D i_normal;
 layout ( set = 0, binding = 4 ) uniform sampler2D i_material;
 layout ( set = 0, binding = 5 ) uniform sampler2DArray i_shadow_maps;
-
+layout(set = 0, binding = 6) uniform accelerationStructureEXT TLAS;
 
 layout(location = 0) out vec4 out_color;
 
+
+//Ray Tracing defines
+#define NUM_SOFT_SHADOW_RAYS 16
+#define LIGHT_RADIUS 0.5   
+
+float evalVisibility(vec3 frag_pos, vec3 normal, vec3 light_dir) {
+    // Origen del rayo
+    vec3 origin = frag_pos + normal * 0.01;
+
+    // Dirección del rayo
+    vec3 direction = normalize(light_dir);
+
+    // Distancia mínima y máxima de recorrido del rayo
+    float t_min = 0.001;
+    float t_max = 100.0;
+
+    // Inicialización del ray query
+    rayQueryEXT ray_query;
+
+    rayQueryInitializeEXT(
+        ray_query,
+        TLAS,
+        gl_RayFlagsTerminateOnFirstHitEXT | gl_RayFlagsOpaqueEXT,
+        0xFF,
+        origin,
+        t_min,
+        direction,
+        t_max
+    );
+
+    // Busqueda de colisiones
+    bool hit = false;
+    while(rayQueryProceedEXT(ray_query)) {
+        if(rayQueryGetIntersectionTypeEXT(ray_query, false) == gl_RayQueryCandidateIntersectionTriangleEXT) {
+            rayQueryConfirmIntersectionEXT(ray_query);
+        }
+    }
+
+    if (rayQueryGetIntersectionTypeEXT(ray_query, true) != gl_RayQueryCommittedIntersectionNoneEXT) {
+        hit = true;
+    }
+
+    return hit ? 0.0 : 1.0;
+}
 
 float evalVisibility(vec3 frag_pos, uint id_light){
     LightData light = per_frame_data.m_lights[id_light];
@@ -153,7 +200,7 @@ vec3 evalMicrofacets()
                 float dist = length(l);
                 l = normalize(l);
                 float att = 1.0 / (light.m_attenuattion.x + light.m_attenuattion.y * dist + light.m_attenuattion.z * dist * dist);
-                visibility = evalVisibility(frag_pos ,id_light);
+                visibility = evalVisibility(frag_pos  ,n,l);
                 radiance = light.m_radiance.rgb * att;
                 break;
             case 2: // ambient
