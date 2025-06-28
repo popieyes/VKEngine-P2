@@ -36,15 +36,21 @@ void main() {
     
     for (int i = 0; i < per_frame_data.m_number_of_lights; ++i) {
 
-       mat4 lightViewProj = per_frame_data.m_lights[i].m_view_projection;
-       
-       gl_Layer = i; // Render to the layer corresponding to the light index
-       
-       for(int j = 0; j < 3; ++j) {
-           vec4 pos = lightViewProj * vec4(g_position[j], 1.0);
-           gl_Position = pos;
-           EmitVertex();
-       }
-      EndPrimitive();
+        mat4 lightVP = per_frame_data.m_lights[i].m_view_projection;
+
+        gl_Layer = i; // Renderizamos a la capa correspondiente al índice de la luz
+
+        for (int j = 0; j < 3; ++j) {
+            vec4 worldPos = vec4(g_position[j], 1.0);
+            vec4 lightSpacePos = lightVP * worldPos;
+            
+            // Perspective divide and invert Z
+            //lightSpacePos.w = 1 - lightSpacePos.w;  // Invert before perspective divide
+            gl_Position = lightSpacePos;
+            EmitVertex();
+        }
+
+        EndPrimitive();
     }
+
 }

@@ -39,38 +39,35 @@ layout ( set = 0, binding = 5 ) uniform sampler2DArray i_shadow_maps;
 layout(location = 0) out vec4 out_color;
 
 
-float evalVisibility(vec3 frag_pos, vec3 normal, uint light_id) {
-    LightData light = per_frame_data.m_lights[light_id];
-    uint light_type = uint(floor(light.m_light_pos.a));
+float evalVisibility(vec3 frag_pos, uint id_light){
+    LightData light = per_frame_data.m_lights[id_light];
+    vec4 light_space_pos = light.m_view_projection * vec4(frag_pos, 1.0);
     
-    // Ambient lights are always visible
-    if (light_type == 2) return 1.0;
-   
-    // Transform fragment position to light space
-    vec4 frag_pos_light_space = light.m_view_projection * vec4(frag_pos, 1.0);
+    vec3 projCoords = light_space_pos.xyz / light_space_pos.w;
+    projCoords.xy = projCoords.xy * 0.5 + 0.5;
+
+    float currentDepth = projCoords.z;
+
+    // Basic algorithm for shadow mapping
+    // float sampleDepth = texture(i_shadow_maps, vec3(projCoords.xy, float(id_light))).r;
+    // float shadow = (sampleDepth < currentDepth) ? 0.0 : 1.0;
     
-    // Perspective divide
-    vec3 proj_coords = frag_pos_light_space.xyz / frag_pos_light_space.w;
-    
-    // Transform to [0,1] range for texture sampling
-    proj_coords = proj_coords * 0.5 + 0.5;
-    
-    // Check if fragment is outside light frustum
-    if (proj_coords.z > 1.0 || 
-        proj_coords.x < 0.0 || proj_coords.x > 1.0 || 
-        proj_coords.y < 0.0 || proj_coords.y > 1.0) {
-        return 0.0;
+    // PCF Implementation
+    // https://www.ogldev.org/www/tutorial42/tutorial42.html
+    vec2 texelUnit = 1.0 / vec2(textureSize(i_shadow_maps, 0).xy);
+    float shadow = 0.0;
+    int samples = 0;
+    for (int x = -1; x <= 1; ++x) {
+        for (int y = -1; y <= 1; ++y) {
+            vec2 offset = vec2(x, y) * texelUnit;
+            float sampleDepth = texture(i_shadow_maps, vec3(projCoords.xy + offset, float(id_light))).r;
+            shadow += (sampleDepth < currentDepth) ? 0.0 : 1.0;
+            samples++;
+        }
     }
-    
-    // Get depth from shadow map
-    float closest_depth = texture(i_shadow_maps, vec3(proj_coords.xy, light_id)).r;
-    float current_depth = proj_coords.z;
-    
-    // Basic shadow mapping with simple bias
-    //float bias = 0.005;
-    
-    // Return 1 if visible, 0 if in shadow
-    return current_depth <= closest_depth ? 1.0 : 0.0;
+    shadow /= float(samples);
+
+    return shadow;
 }
 
 vec3 evalDiffuse()
@@ -87,7 +84,7 @@ vec3 evalDiffuse()
         uint light_type = uint( floor( light.m_light_pos.a ) );
 
         // Check visibility
-        float visibility = evalVisibility(frag_pos, n, id_light);
+        float visibility = 1.0f;
 
         switch( light_type )
         {
@@ -103,7 +100,7 @@ vec3 evalDiffuse()
                 float dist = length( l );
                 float att = 1.0 / (light.m_attenuattion.x + light.m_attenuattion.y * dist + light.m_attenuattion.z * dist * dist );
                 vec3 radiance = light.m_radiance.rgb * att;
-
+                visibility = evalVisibility(frag_pos, id_light);
                 shading += max( dot( n, l ), 0.0 ) * albedo.rgb * radiance * visibility;
                 break;
             }
@@ -118,38 +115,7 @@ vec3 evalDiffuse()
     return shading;
 }
 
-float normalDistribution(vec3 h, vec3 n, float roughness){
-	float alpha = pow(roughness, 2.f);
-    float dotNH = max(dot(n, h), 0.0);
-	float pow_alpha = pow(alpha, 2.f);
-	float ndf = pow_alpha / (PI * pow(pow(dotNH, 2.f) * (pow_alpha - 1) + 1, 2.f));
-    return ndf;
-}
 
-float geometricTerm(vec3 v, vec3 n, float roughness){
-	float k = pow(roughness + 1, 2) / 8;
-	float dotNV = max(dot(n, v), 0.0);
-	
-	float g = dotNV/(dotNV * (1 - k) + k);
-	
-	return g;
-}
-
-float fresnelScalar(vec3 v, vec3 h, float F0){
-	float dotVH = max(dot(v, h), 0.0);
-	
-	float fresnel = F0 + (1 - F0) * pow(2, -5.55573f * dotVH - 6.98316f * dotVH);
-	//float fresnel = F0 + (1 - F0) * pow(1 - dotVH, 5);
-	return fresnel;
-}
-
-vec3 fresnelVec(vec3 v, vec3 h, vec3 F0){
-	float dotVH = max(dot(v, h), 0.0);
-	
-	vec3 fresnel = F0 + (1 - F0) * pow(2, -5.55573f * dotVH - 6.98316f * dotVH);
-	//float fresnel = F0 + (1 - F0) * pow(1 - dotVH, 5);
-	return fresnel;
-}
 
 vec3 evalMicrofacets()
 {
@@ -173,7 +139,7 @@ vec3 evalMicrofacets()
         
         vec3 l;
         vec3 radiance;
-        float visibility = evalVisibility(frag_pos, n, id_light);
+        float visibility = 1.0f;
         // Calculate light direction and radiance based on light type
         switch(light_type)
         {
@@ -186,6 +152,7 @@ vec3 evalMicrofacets()
                 float dist = length(l);
                 l = normalize(l);
                 float att = 1.0 / (light.m_attenuattion.x + light.m_attenuattion.y * dist + light.m_attenuattion.z * dist * dist);
+                visibility = evalVisibility(frag_pos ,id_light);
                 radiance = light.m_radiance.rgb * att;
                 break;
             case 2: // ambient
