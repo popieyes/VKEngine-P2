@@ -216,22 +216,6 @@ void DeviceVK::createDevice()
 
     // Start chaining from the last element so we preserve order
     void** pNextHead = &m_physical_device_features2.pNext;
-
-    VkPhysicalDeviceRayQueryFeaturesKHR rayQueryFeatures = {};
-
-    
-    if (std::find(m_supported_extensions.begin(), m_supported_extensions.end(), VK_KHR_RAY_QUERY_EXTENSION_NAME) !=
-        m_supported_extensions.end())
-    {
-        m_extensions.push_back(VK_KHR_RAY_QUERY_EXTENSION_NAME);
-
-        rayQueryFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_QUERY_FEATURES_KHR;
-        rayQueryFeatures.pNext = nullptr;
-        rayQueryFeatures.rayQuery = VK_TRUE;
-
-        *pNextHead = &rayQueryFeatures;
-        pNextHead = &rayQueryFeatures.pNext;
-    }
    
     // 1. Buffer Device Address (requerido por Acceleration Structure)
     VkPhysicalDeviceBufferDeviceAddressFeatures bufferDeviceAddressFeatures = {};

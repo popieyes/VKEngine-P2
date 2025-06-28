@@ -18,12 +18,20 @@ namespace MiniEngine
 
         void draw( VkCommandBuffer& i_command_buffer, const uint32_t i_instance_id );
 
+        inline VkAccelerationStructureKHR getBLAS()
+        {
+            return m_blas_structure;
+        }
+
+        int a;
+
     private:
         MeshVK( const MeshVK& ) = delete;
         MeshVK& operator=(const MeshVK& ) = delete;
 
         VkBuffer createVertexBuffer( const std::vector<Vertex>& i_data, VkDeviceMemory& i_memory );
         void createIndexBuffer ();
+        void createBLASBuffer();
 
         const Runtime& m_runtime;
 
@@ -36,6 +44,11 @@ namespace MiniEngine
         VkBuffer                                       m_data_buffer;
         VkDeviceMemory                                 m_indices_memory;
         VkDeviceMemory                                 m_data_memory;
+
+        VkAccelerationStructureKHR                     m_blas_structure; 
+        VkBuffer                                       m_blas_buffer;
+        VkDeviceMemory                                 m_blas_memory;
+
     
     };
 };
