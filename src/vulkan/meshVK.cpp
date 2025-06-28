@@ -6,7 +6,7 @@
 #include "vulkan/utilsVK.h"
 
 using namespace MiniEngine;
-#define RTX
+
 
 
 MeshVK::MeshVK( const Runtime& i_runtime, const std::string& i_path, const std::vector<uint32_t> i_indices, const std::vector<Vertex> i_vertices ) :

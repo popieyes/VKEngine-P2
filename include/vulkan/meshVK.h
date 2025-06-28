@@ -23,8 +23,6 @@ namespace MiniEngine
             return m_blas_structure;
         }
 
-        int a;
-
     private:
         MeshVK( const MeshVK& ) = delete;
         MeshVK& operator=(const MeshVK& ) = delete;

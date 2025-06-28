@@ -190,7 +190,7 @@ void DeviceVK::createDevice()
     device_create_info.queueCreateInfoCount = static_cast< uint32_t >( queue_create_infos.size() );
     device_create_info.pQueueCreateInfos    = queue_create_infos.data();
     //device_create_info.pEnabledFeatures     = &m_physical_device_features;
-    device_create_info.pEnabledFeatures = nullptr; // Ya no usamos esto directamente
+    device_create_info.pEnabledFeatures = VK_NULL_HANDLE; // Ya no usamos esto directamente
     device_create_info.pNext                = &m_physical_device_features2;
 
     // Enable the debug marker extension if it is present (likely meaning a debugging tool is present)

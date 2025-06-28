@@ -12,6 +12,7 @@
 #include "diffuse.h"
 #include "microfacets.h"
 
+
 // vulkan includes
 #include "vulkan/rendererVK.h"
 #include "vulkan/renderPassVK.h"
@@ -22,6 +23,8 @@
 #include "vulkan/windowVK.h"
 #include "vulkan/deviceVK.h"
 #include "vulkan/utilsVK.h"
+#include "vulkan/meshVK.h"
+#include "vulkan/vulkan.h"
 
 
 
@@ -75,7 +78,7 @@ bool Engine::initialize()
     m_runtime.m_shader_registry->initialize();
 
     createSyncObjects ();
-
+    
     return true;
 }
 
@@ -144,6 +147,7 @@ void Engine::run()
             createSamplers    ();
             createAttachments ();
             createRenderPasses();
+            updateTLAS();
         }                   
 
 
@@ -173,6 +177,23 @@ void Engine::shutdown()
     destroyAttachments ();
     destroySamplers    ();
     destroySyncObjects ();
+
+#ifdef RTX
+    if (m_tlas_structure != VK_NULL_HANDLE)
+    {
+        vkDeviceWaitIdle(m_runtime.m_renderer->getDevice()->getLogicalDevice());
+
+        vkDestroyAccelerationStructure(m_runtime.m_renderer->getDevice()->getLogicalDevice(), m_tlas_structure, nullptr);
+        vkFreeMemory(m_runtime.m_renderer->getDevice()->getLogicalDevice(), m_tlas_memory, nullptr);
+        vkDestroyBuffer(m_runtime.m_renderer->getDevice()->getLogicalDevice(), m_tlas_buffer, nullptr);
+
+        // También limpia los buffers de instancias si los tienes
+        if (m_instances_buffer != VK_NULL_HANDLE) {
+            vkDestroyBuffer(m_runtime.m_renderer->getDevice()->getLogicalDevice(), m_instances_buffer, nullptr);
+            vkFreeMemory(m_runtime.m_renderer->getDevice()->getLogicalDevice(), m_instances_memory, nullptr);
+        }
+    }
+#endif
 
     m_runtime.m_mesh_registry->shutdown();
     m_runtime.m_shader_registry->shutdown();
@@ -499,3 +520,95 @@ void Engine::destroySamplers()
     }
 }
 
+//TLAS
+void Engine::updateTLAS() {
+#ifdef RTX
+    try {
+        // Verificar inicialización
+        if (!m_runtime.m_renderer || !m_runtime.m_renderer->getDevice()) {
+            throw std::runtime_error("Renderer or device not initialized");
+        }
+
+        VkDevice device = m_runtime.m_renderer->getDevice()->getLogicalDevice();
+           
+        // Destruir TLAS anterior de forma segura
+        if (m_tlas_structure != VK_NULL_HANDLE)
+        {
+            vkDeviceWaitIdle(m_runtime.m_renderer->getDevice()->getLogicalDevice());
+
+            vkDestroyAccelerationStructure(m_runtime.m_renderer->getDevice()->getLogicalDevice(), m_tlas_structure, nullptr);
+            vkFreeMemory(m_runtime.m_renderer->getDevice()->getLogicalDevice(), m_tlas_memory, nullptr);
+            vkDestroyBuffer(m_runtime.m_renderer->getDevice()->getLogicalDevice(), m_tlas_buffer, nullptr);
+
+            // También limpia los buffers de instancias si los tienes
+            if (m_instances_buffer != VK_NULL_HANDLE) {
+                vkDestroyBuffer(m_runtime.m_renderer->getDevice()->getLogicalDevice(), m_instances_buffer, nullptr);
+                vkFreeMemory(m_runtime.m_renderer->getDevice()->getLogicalDevice(), m_instances_memory, nullptr);
+            }
+
+			m_tlas_buffer = VK_NULL_HANDLE;
+			m_tlas_memory = VK_NULL_HANDLE;
+			m_instances_buffer = VK_NULL_HANDLE;
+			m_instances_memory = VK_NULL_HANDLE;
+			m_tlas_structure = VK_NULL_HANDLE;
+        }
+
+
+        // Verificar escena
+        if (!m_scene) {
+            throw std::runtime_error("Scene is null");
+        }
+
+        // Obtener entidades con verificación
+        auto entities = m_scene->getMeshes();
+        if (entities.empty()) {
+            return; // Escena vacía, no hay nada que actualizar
+        }
+
+        std::vector<Matrix4f> transforms;
+        std::vector<VkAccelerationStructureKHR> blasHandles;
+        transforms.reserve(entities.size());
+        blasHandles.reserve(entities.size());
+
+        for (auto entity : entities) {
+            if (!entity) {
+                continue; // O loggear un warning
+            }
+
+            try {
+                transforms.push_back(entity->getTransform().getTransform());
+
+                // Verificar BLAS
+                auto blas = entity->getMesh().getBLAS();
+                if (blas == VK_NULL_HANDLE) {
+                    throw std::runtime_error("Entity has invalid BLAS");
+                }
+                blasHandles.push_back(blas);
+            }
+            catch (const std::exception& e) {
+                // Loggear error pero continuar con otras entidades
+                std::cerr << "Error processing entity: " << e.what() << std::endl;
+            }
+        }
+
+        // Verificar que tenemos datos válidos
+        if (transforms.empty() || transforms.size() != blasHandles.size()) {
+            throw std::runtime_error("Invalid TLAS data");
+        }
+
+        // Crear nuevo TLAS
+        UtilsVK::createTLAS(
+            *m_runtime.m_renderer->getDevice(),
+            transforms,
+            blasHandles,
+            m_tlas_structure,
+            m_tlas_buffer,
+            m_tlas_memory
+        );
+    }
+    catch (const std::exception& e) {
+        std::cerr << "Failed to update TLAS: " << e.what() << std::endl;
+        // Considerar limpiar recursos parcialmente creados aquí
+    }
+#endif
+}

@@ -25,6 +25,8 @@
 #define SHADOW_MAP_SIZE 1024
 #define SHADOW_MAP_LAYERS 10
 
+#define RTX
+
 namespace MiniEngine
 {
 /// Simple exception class, which stores a human-readable error description

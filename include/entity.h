@@ -42,6 +42,11 @@ namespace MiniEngine
            return m_entity_offset;
        }
 
+       inline MeshVK& getMesh() const
+       {
+           return *m_mesh;
+       }
+
     private:
         Entity( const Entity& ) = delete;
         Entity& operator=(const Entity& ) = delete;

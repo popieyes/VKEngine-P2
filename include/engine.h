@@ -23,6 +23,14 @@ namespace MiniEngine
 
         void loadScene     ( const std::string& i_path );
 
+        inline const VkAccelerationStructureKHR getTLAS() const
+        {
+            return m_tlas_structure;
+        }
+
+        void updateTLAS();
+
+
     private:
         Engine( const Engine& ) = delete;
         Engine& operator=(const Engine& ) = delete;
@@ -59,5 +67,15 @@ namespace MiniEngine
         
         Attachments m_render_target_attachments;
         std::array<VkSampler, 1> m_global_samplers;
+
+        //TLAS
+        VkAccelerationStructureKHR m_tlas_structure = VK_NULL_HANDLE;
+        VkBuffer m_tlas_buffer = VK_NULL_HANDLE;
+        VkDeviceMemory m_tlas_memory = VK_NULL_HANDLE;
+
+        //TLAS instance
+        VkBuffer m_instances_buffer = VK_NULL_HANDLE;
+        VkDeviceMemory m_instances_memory = VK_NULL_HANDLE;
+
     };
 };
