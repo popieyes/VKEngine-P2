@@ -158,7 +158,7 @@ float evalVisibility(vec3 frag_pos, vec3 normal, vec3 light_dir) {
 }
 
 // Shadow Mapping Visibility Evaluation
-float evalVisibility(vec3 frag_pos, uint id_light){
+float evalVisibility(vec3 frag_pos, uint id_light, vec3 normal) {
     LightData light = per_frame_data.m_lights[id_light];
     vec4 light_space_pos = light.m_view_projection * vec4(frag_pos, 1.0);
     
@@ -166,26 +166,31 @@ float evalVisibility(vec3 frag_pos, uint id_light){
     projCoords.xy = projCoords.xy * 0.5 + 0.5;
 
     float currentDepth = projCoords.z;
-
     
-    
-    // PCF Implementation
-    vec2 texelUnit = 1.0 / vec2(textureSize(i_shadow_maps, 0).xy);
+    // PCF 
+    vec2 texel_size = 1.0 / vec2(textureSize(i_shadow_maps, 0));
     float shadow = 0.0;
-    int samples = 0;
+    
+    // Kernel de 3x3 con muestreo estratificado
     for (int x = -1; x <= 1; ++x) {
         for (int y = -1; y <= 1; ++y) {
-            vec2 offset = vec2(x, y) * texelUnit;
-            float sampleDepth = texture(i_shadow_maps, vec3(projCoords.xy + offset, float(id_light))).r;
-            shadow += (sampleDepth < currentDepth) ? 0.0 : 1.0;
-            samples++;
+            // Muestreo con patrón de rotación para reducir artifacts
+            float rot_angle = float(id_light) * 0.785; // Rotación única por luz
+            mat2 rot = mat2(cos(rot_angle), -sin(rot_angle), 
+                          sin(rot_angle),  cos(rot_angle));
+            vec2 offset = rot * vec2(x, y) * texel_size;
+            
+            float closest_depth = texture(i_shadow_maps, vec3(projCoords.xy + offset, float(id_light))).r;
+            shadow += (currentDepth > closest_depth) ? 0.0 : 1.0;
         }
     }
-    shadow /= float(samples); 
-
+    
+    // Promedio de muestras
+    shadow /= 9.0;
+    
     // Basic algorithm for shadow mapping
-    //float sampleDepth = texture(i_shadow_maps, vec3(projCoords.xy, float(id_light))).r;
-    //float shadow = (sampleDepth < currentDepth) ? 0.0 : 1.0;
+/*     float sampleDepth = texture(i_shadow_maps, vec3(projCoords.xy, float(id_light))).r;
+    float shadow = (sampleDepth < currentDepth) ? 0.0 : 1.0; */
     
     return shadow;
 }
@@ -220,7 +225,7 @@ vec3 evalDiffuse()
                 float dist = length( l );
                 float att = 1.0 / (light.m_attenuattion.x + light.m_attenuattion.y * dist + light.m_attenuattion.z * dist * dist );
                 vec3 radiance = light.m_radiance.rgb * att;
-                visibility = evalVisibility(frag_pos, id_light);
+                visibility = evalVisibility(frag_pos, id_light,n);
                 shading += max( dot( n, l ), 0.0 ) * albedo.rgb * radiance * visibility;
                 break;
             }
@@ -276,7 +281,12 @@ vec3 evalMicrofacets()
                 float lightRadius = 0.025;
                 float coneAngle = atan(lightRadius / dist);
                 int numSamples = 64;
-                visibility = evalVisibility(frag_pos, n, l,coneAngle, numSamples);
+                // Soft Shadows
+                visibility = evalVisibility(frag_pos, n, (light.m_light_pos).xyz - frag_pos,coneAngle, numSamples);
+         /*        // Hard Shadows
+                visibility = evalVisibility(frag_pos, n, (light.m_light_pos).xyz - frag_pos); */
+               /*  // Shadow Mapping
+                 visibility = evalVisibility(frag_pos, id_light, n);  */
                 radiance = light.m_radiance.rgb * att;
                 break;
             case 2: // ambient
