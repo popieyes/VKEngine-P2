@@ -167,7 +167,7 @@ float evalVisibility(vec3 frag_pos, uint id_light, vec3 normal) {
 
     float currentDepth = projCoords.z;
     
-    // PCF 
+  /*   // PCF 
     vec2 texel_size = 1.0 / vec2(textureSize(i_shadow_maps, 0));
     float shadow = 0.0;
     
@@ -186,11 +186,11 @@ float evalVisibility(vec3 frag_pos, uint id_light, vec3 normal) {
     }
     
     // Promedio de muestras
-    shadow /= 9.0;
+    shadow /= 9.0; */
     
     // Basic algorithm for shadow mapping
-/*     float sampleDepth = texture(i_shadow_maps, vec3(projCoords.xy, float(id_light))).r;
-    float shadow = (sampleDepth < currentDepth) ? 0.0 : 1.0; */
+    float sampleDepth = texture(i_shadow_maps, vec3(projCoords.xy, float(id_light))).r;
+    float shadow = (sampleDepth < currentDepth) ? 0.0 : 1.0;
     
     return shadow;
 }
@@ -281,12 +281,12 @@ vec3 evalMicrofacets()
                 float lightRadius = 0.025;
                 float coneAngle = atan(lightRadius / dist);
                 int numSamples = 64;
-                // Soft Shadows
+               /*  // Soft Shadows
                 visibility = evalVisibility(frag_pos, n, (light.m_light_pos).xyz - frag_pos,coneAngle, numSamples);
-         /*        // Hard Shadows
+                // Hard Shadows
                 visibility = evalVisibility(frag_pos, n, (light.m_light_pos).xyz - frag_pos); */
-               /*  // Shadow Mapping
-                 visibility = evalVisibility(frag_pos, id_light, n);  */
+                // Shadow Mapping
+                 visibility = evalVisibility(frag_pos, id_light, n); 
                 radiance = light.m_radiance.rgb * att;
                 break;
             case 2: // ambient
