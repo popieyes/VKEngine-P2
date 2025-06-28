@@ -137,7 +137,7 @@ VkCommandBuffer ShadowPassVK::draw(const Frame& i_frame)
     VkCommandBufferBeginInfo begin_info{};
     begin_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
-    uint32_t width = 1024, height = 1024;
+    uint32_t width, height;
     renderer.getWindow().getWindowSize(width, height);
 
     VkRenderPassBeginInfo render_pass_info{};

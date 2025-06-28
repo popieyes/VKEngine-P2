@@ -48,12 +48,9 @@ float evalVisibility(vec3 frag_pos, uint id_light){
 
     float currentDepth = projCoords.z;
 
-    // Basic algorithm for shadow mapping
-    // float sampleDepth = texture(i_shadow_maps, vec3(projCoords.xy, float(id_light))).r;
-    // float shadow = (sampleDepth < currentDepth) ? 0.0 : 1.0;
+    
     
     // PCF Implementation
-    // https://www.ogldev.org/www/tutorial42/tutorial42.html
     vec2 texelUnit = 1.0 / vec2(textureSize(i_shadow_maps, 0).xy);
     float shadow = 0.0;
     int samples = 0;
@@ -65,8 +62,12 @@ float evalVisibility(vec3 frag_pos, uint id_light){
             samples++;
         }
     }
-    shadow /= float(samples);
+    shadow /= float(samples); 
 
+    // Basic algorithm for shadow mapping
+    //float sampleDepth = texture(i_shadow_maps, vec3(projCoords.xy, float(id_light))).r;
+    //float shadow = (sampleDepth < currentDepth) ? 0.0 : 1.0;
+    
     return shadow;
 }
 
